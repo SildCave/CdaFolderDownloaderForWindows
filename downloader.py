@@ -91,8 +91,8 @@ if __name__ == '__main__':
             f.write(r.content)
 
     leading_zeros = int(len(videos.video_urls) / 10) + 1
-    if not os.path.exists(videos.folder_name):
-        os.mkdir(slugify(videos.folder_name, False))
+    # if not os.path.exists(videos.folder_name):
+    #     os.mkdir(slugify(videos.folder_name, False))
 
     commands = []
     for i, video in enumerate(videos.video_urls):
