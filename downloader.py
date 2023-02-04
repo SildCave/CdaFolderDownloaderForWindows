@@ -6,6 +6,8 @@ import threading
 import argparse
 import subprocess
 import sys
+import re
+import unicodedata
 
 class DevNull:
     def write(self, msg):
@@ -13,6 +15,22 @@ class DevNull:
 
 sys.stderr = DevNull()
 
+
+def slugify(value, allow_unicode=False):
+    """
+    Taken from https://github.com/django/django/blob/master/django/utils/text.py
+    Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
+    dashes to single dashes. Remove characters that aren't alphanumerics,
+    underscores, or hyphens. Convert to lowercase. Also strip leading and
+    trailing whitespace, dashes, and underscores.
+    """
+    value = str(value)
+    if allow_unicode:
+        value = unicodedata.normalize('NFKC', value)
+    else:
+        value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    value = re.sub(r'[^\w\s-]', '', value.lower())
+    return re.sub(r'[-\s]+', '-', value).strip('-_')
 
 class CdaFolderScraper:
     def __init__(self, url):
@@ -74,7 +92,7 @@ if __name__ == '__main__':
 
     leading_zeros = int(len(videos.video_urls) / 10) + 1
     if not os.path.exists(videos.folder_name):
-        os.mkdir(videos.folder_name)
+        os.mkdir(slugify(videos.folder_name, False))
 
     commands = []
     for i, video in enumerate(videos.video_urls):
